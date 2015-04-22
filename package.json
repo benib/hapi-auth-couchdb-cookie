@@ -1,0 +1,42 @@
+{
+  "name": "hapi-auth-couchdb-cookie",
+  "description": "CouchDB Cookie authentication plugin",
+  "version": "0.0.0",
+  "repository": {},
+  "main": "index",
+  "keywords": [
+    "hapi",
+    "plugin",
+    "couchdb",
+    "auth",
+    "cookie",
+    "session"
+  ],
+  "engines": {
+    "node": ">=0.10.32"
+  },
+  "dependencies": {
+    "boom": "^2.7.0",
+    "hoek": "^2.12.0",
+    "nano": "^6.1.2"
+  },
+  "peerDependencies": {
+    "hapi": "^8.4.0"
+  },
+  "devDependencies": {
+    "code": "^1.4.0",
+    "eslint": "^0.19.0",
+    "hapi": "^8.4.0",
+    "lab": "^5.5.1"
+  },
+  "scripts": {
+    "lint": "eslint ./",
+    "test": "node ./node_modules/lab/bin/lab -a code -t 100"
+  },
+  "licenses": [
+    {
+      "type": "MIT",
+      "url": "http://github.com/ubilabs/hapi-auth-couchdb-cookie/raw/master/LICENSE"
+    }
+  ]
+}
