@@ -1,11 +1,12 @@
 image: node:0.12
 
+services:
+  - klaemo/couchdb:latest
+
 script:
   # workaround for cache, see https://github.com/drone/drone/issues/147
   - mkdir -p /tmp/npm
   - npm config set cache /tmp/npm --global
-
-  - apt-get install couchdb
 
   # actual tests
   - npm install --silent
