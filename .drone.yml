@@ -1,7 +1,7 @@
 image: node:0.12
 
 services:
-  - couchdb:1.6
+  - couchdb
 
 script:
   # workaround for cache, see https://github.com/drone/drone/issues/147
