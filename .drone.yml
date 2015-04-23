@@ -1,7 +1,4 @@
-image: node:0.12
-
-services:
-  - klaemo/couchdb:latest
+image: frodenas/couchdb
 
 script:
   # workaround for cache, see https://github.com/drone/drone/issues/147
