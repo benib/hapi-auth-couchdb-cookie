@@ -306,7 +306,7 @@ describe('scheme', function() {
     server.register(require('../'), function(error) {
       expect(error).to.not.exist();
 
-      server.auth.strategy('default', 'couchdb-cookie', true, {});
+      server.auth.strategy('default', 'couchdb-cookie', true);
 
       server.route({
         method: 'GET',
