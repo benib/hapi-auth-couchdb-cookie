@@ -1,4 +1,4 @@
-image: frodenas/couchdb
+image: roka/node-couchdb
 
 script:
   # workaround for cache, see https://github.com/drone/drone/issues/147
