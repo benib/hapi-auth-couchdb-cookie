@@ -556,6 +556,53 @@ describe('scheme', function() {
     });
   });
 
+  it('allows overriding username and password', function(done) {
+    var server = new Hapi.Server();
+
+    server.connection();
+    server.register(require('../'), function(error) {
+      expect(error).to.not.exist();
+
+      server.auth.strategy('default', 'couchdb-cookie', true, {
+        validateFunc: function(session, callback) {
+          var override = Hoek.clone(session);
+          override.something = 'new';
+
+          return callback(null, session.name === 'tester', override);
+        }
+      });
+
+      server.route({
+        method: 'GET',
+        path: '/login/{myuser}/{secrettext}',
+        config: {
+          auth: {
+            mode: 'try'
+          },
+          plugins: {
+            'hapi-auth-couchdb-cookie': {
+              usernameParam: 'myuser',
+              passwordParam: 'secrettext'
+            }
+          },
+          handler: function(request, reply) {
+            return reply(request.params.myuser + request.params.secrettext);
+          }
+        }
+      });
+
+      server.inject('/login/tester/pw', function(validResponse) {
+        expect(validResponse.result).to.equal('testerpw');
+
+        var header = validResponse.headers['set-cookie'];
+        expect(header.length).to.equal(1);
+        // expect(header[0]).to.contain('Max-Age=60');
+
+        done();
+      });
+    });
+  });
+
   describe('redirection', function() {
     it('sends to login page (uri without query)', function(done) {
       var server = new Hapi.Server();
