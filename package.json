@@ -23,14 +23,22 @@
     "hapi": "^8.4.0"
   },
   "devDependencies": {
+    "bumpery": "^1.0.4",
     "code": "^1.4.0",
+    "conventional-changelog-generator": "0.0.3",
     "eslint": "^0.19.0",
     "hapi": "^8.4.0",
     "lab": "^5.5.1"
   },
   "scripts": {
     "lint": "eslint ./",
-    "test": "npm run lint && node ./node_modules/lab/bin/lab -a code -t 98"
+    "test": "npm run lint && node ./node_modules/lab/bin/lab -a code -t 98",
+    "changelog": "conventional-changelog-generator && vim -w CHANGELOG.md",
+    "release": "echo 'Usage: npm run release:patch|minor|major'",
+    "release:patch": "bumpery --verify='npm test' --no-push --no-commit --no-createTag --versionType patch && npm run changelog && npm run release:commit",
+    "release:minor": "bumpery --verify='npm test' --no-push --no-commit --no-createTag --versionType minor && npm run changelog && npm run release:commit",
+    "release:major": "bumpery --verify='npm test' --no-push --no-commit --no-createTag --versionType major && npm run changelog && npm run release:commit",
+    "release:commit": "bumpery --commitFiles 'CHANGELOG.md package.json' --commitMessage 'chore(release): version %VERSION%' --tagName '%VERSION%' --no-bumpVersion && npm publish"
   },
   "licenses": [
     {
