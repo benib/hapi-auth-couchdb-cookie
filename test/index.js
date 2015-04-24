@@ -100,6 +100,42 @@ describe('scheme', function() {
     });
   });
 
+  it('denies a request without auth', function(done) {
+    var server = new Hapi.Server();
+
+    server.connection();
+    server.register(require('../'), function(error) {
+      expect(error).to.not.exist();
+
+      server.auth.strategy('default', 'couchdb-cookie', true, {
+        validateFunc: function(session, callback) {
+          var override = Hoek.clone(session);
+          override.something = 'new';
+
+          return callback(null, session.name === 'tester', override);
+        }
+      });
+
+      server.route({
+        method: 'GET',
+        path: '/resource',
+        handler: function(request, reply) {
+          expect(request.auth.credentials.something).to.equal('new');
+          return reply('resource');
+        }
+      });
+
+      server.inject({
+        method: 'GET',
+        url: '/resource'
+      }, function(resourceResponse) {
+        expect(resourceResponse.statusCode).to.equal(401);
+        expect(resourceResponse.headers['set-cookie']).to.not.exist();
+        done();
+      });
+    });
+  });
+
   it('fails over to another strategy if not present', function(done) {
     var extraSchemePlugin = function(plugin, options, next) {
       var simpleTestSchema = function() {
