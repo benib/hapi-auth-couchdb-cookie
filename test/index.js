@@ -510,37 +510,34 @@ describe('scheme', function() {
       });
     });
 
-//     it('skips when redirectOnTry is false in try mode', function(done) {
-//       var server = new Hapi.Server();
-//       server.connection();
-//       server.register(require('../'), function(error) {
-//         expect(error).to.not.exist();
-//
-//         server.auth.strategy('default', 'couchdb-cookie', 'try', {
-//           // password: 'password',
-//           // ttl: 60 * 1000,
-//           redirectOnTry: false,
-//           redirectTo: 'http://example.com/login',
-//           appendNext: true
-//         });
-//
-//         server.route({
-//           method: 'GET',
-//           path: '/',
-//           handler: function(request, reply) {
-//
-//             return reply(request.auth.isAuthenticated);
-//           }
-//         });
-//
-//         server.inject('/', function(res) {
-//           expect(res.statusCode).to.equal(200);
-//           expect(res.result).to.equal(false);
-//           done();
-//         });
-//       });
-//     });
-//
+    it('skips when redirectOnTry is false in try mode', function(done) {
+      var server = new Hapi.Server();
+      server.connection();
+      server.register(require('../'), function(error) {
+        expect(error).to.not.exist();
+
+        server.auth.strategy('default', 'couchdb-cookie', 'try', {
+          redirectOnTry: false,
+          redirectTo: 'http://example.com/login',
+          appendNext: true
+        });
+
+        server.route({
+          method: 'GET',
+          path: '/',
+          handler: function(request, reply) {
+            return reply(request.auth.isAuthenticated);
+          }
+        });
+
+        server.inject('/', function(res) {
+          expect(res.statusCode).to.equal(200);
+          expect(res.result).to.equal(false);
+          done();
+        });
+      });
+    });
+
 //     it('sends to login page (uri with query)', function(done) {
 //       var server = new Hapi.Server();
 //       server.connection();
