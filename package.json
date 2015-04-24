@@ -30,7 +30,7 @@
   },
   "scripts": {
     "lint": "eslint ./",
-    "test": "node ./node_modules/lab/bin/lab -a code -t 100"
+    "test": "npm run lint && node ./node_modules/lab/bin/lab -a code -t 98"
   },
   "licenses": [
     {

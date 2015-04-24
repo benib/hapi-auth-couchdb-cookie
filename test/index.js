@@ -202,8 +202,8 @@ describe('scheme', function() {
               strategies: ['default', 'simple']
             },
             handler: function(request, reply) {
-              var credentialsTest = (request.auth.credentials &&
-                request.auth.credentials.test) || 'NOT AUTH';
+              var credentialsTest = request.auth.credentials &&
+                request.auth.credentials.test || 'NOT AUTH';
               return reply('multiple ' + credentialsTest);
             }
           }
