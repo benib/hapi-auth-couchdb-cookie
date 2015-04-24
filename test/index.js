@@ -480,8 +480,6 @@ describe('scheme', function() {
           cookie: 'AuthSession=123456'
         }
       }, function(res) {
-        console.log(res.headers);
-
         expect(res.statusCode).to.equal(401);
         expect(res.headers['set-cookie'][0])
           .to.equal('AuthSession=; Max-Age=0; Expires=Thu, ' +
