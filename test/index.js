@@ -448,41 +448,35 @@ describe('scheme', function() {
     });
   });
 
-//   describe('redirection', function() {
-//
-//     it('sends to login page (uri without query)', function(done) {
-//
-//       var server = new Hapi.Server();
-//       server.connection();
-//       server.register(require('../'), function(error) {
-//
-//         expect(error).to.not.exist();
-//
-//         server.auth.strategy('default', 'couchdb-cookie', true, {
-//           // password: 'password',
-//           // ttl: 60 * 1000,
-//           redirectTo: 'http://example.com/login',
-//           appendNext: true
-//         });
-//
-//         server.route({
-//           method: 'GET',
-//           path: '/',
-//           handler: function(request, reply) {
-//
-//             return reply('never');
-//           }
-//         });
-//
-//         server.inject('/', function(res) {
-//
-//           expect(res.statusCode).to.equal(302);
-//           expect(res.headers.location).to.equal('http://example.com/login?next=%2F');
-//           done();
-//         });
-//       });
-//     });
-//
+  describe('redirection', function() {
+    it('sends to login page (uri without query)', function(done) {
+      var server = new Hapi.Server();
+      server.connection();
+      server.register(require('../'), function(error) {
+        expect(error).to.not.exist();
+
+        server.auth.strategy('default', 'couchdb-cookie', true, {
+          redirectTo: 'http://example.com/login',
+          appendNext: true
+        });
+
+        server.route({
+          method: 'GET',
+          path: '/',
+          handler: function(request, reply) {
+            return reply('never');
+          }
+        });
+
+        server.inject('/', function(res) {
+          expect(res.statusCode).to.equal(302);
+          expect(res.headers.location)
+            .to.equal('http://example.com/login?next=%2F');
+          done();
+        });
+      });
+    });
+
 //     it('skips when route override', function(done) {
 //       var server = new Hapi.Server();
 //       server.connection();
@@ -687,5 +681,5 @@ describe('scheme', function() {
 //         done();
 //       });
 //     });
-//   });
+  });
 });
