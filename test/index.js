@@ -489,6 +489,33 @@ describe('scheme', function() {
     });
   });
 
+  it('accepts a custom CouchDB url', function(done) {
+    var server = new Hapi.Server();
+    server.connection();
+    server.register(require('../'), function(error) {
+      expect(error).to.not.exist();
+
+      server.auth.strategy('default', 'couchdb-cookie', true, {
+        couchdbUrl: 'http://localhost:6984'
+      });
+
+      server.route({
+        method: 'GET',
+        path: '/',
+        handler: function(request, reply) {
+          return reply();
+        }
+      });
+
+      server.inject({
+        url: '/'
+      }, function(res) {
+        expect(res.statusCode).to.equal(500);
+        done();
+      });
+    });
+  });
+
   describe('redirection', function() {
     it('sends to login page (uri without query)', function(done) {
       var server = new Hapi.Server();
