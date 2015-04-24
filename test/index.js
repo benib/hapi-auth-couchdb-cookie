@@ -130,7 +130,9 @@ describe('scheme', function() {
         url: '/resource'
       }, function(resourceResponse) {
         expect(resourceResponse.statusCode).to.equal(401);
-        expect(resourceResponse.headers['set-cookie']).to.not.exist();
+        expect(resourceResponse.headers['set-cookie'][0])
+          .to.equal('AuthSession=; Max-Age=0; Expires=Thu, ' +
+            '01 Jan 1970 00:00:00 GMT');
         done();
       });
     });
@@ -297,7 +299,9 @@ describe('scheme', function() {
             }
           }, function(resourceResponse) {
             expect(resourceResponse.statusCode).to.equal(401);
-            expect(resourceResponse.headers['set-cookie']).to.not.exist();
+            expect(resourceResponse.headers['set-cookie'][0])
+              .to.equal('AuthSession=; Max-Age=0; Expires=Thu, ' +
+                '01 Jan 1970 00:00:00 GMT');
             expect(resourceResponse.result).to.not.equal('resource');
             done();
           });
@@ -346,7 +350,9 @@ describe('scheme', function() {
 
       server.inject('/login/invalid/pw', function(res) {
         expect(res.result).to.equal('invalid');
-        expect(res.headers['set-cookie']).to.not.exist();
+        expect(res.headers['set-cookie'][0])
+          .to.equal('AuthSession=; Max-Age=0; Expires=Thu, ' +
+            '01 Jan 1970 00:00:00 GMT');
 
         server.inject({
           method: 'GET',
@@ -355,7 +361,9 @@ describe('scheme', function() {
             cookie: ''
           }
         }, function(resourceRes) {
-          expect(resourceRes.headers['set-cookie']).to.not.exist();
+          expect(resourceRes.headers['set-cookie'][0])
+            .to.equal('AuthSession=; Max-Age=0; Expires=Thu, ' +
+              '01 Jan 1970 00:00:00 GMT');
           expect(resourceRes.statusCode).to.equal(401);
           done();
         });
@@ -442,7 +450,42 @@ describe('scheme', function() {
 
       server.inject('/login/tester/pw', function(validResponse) {
         expect(validResponse.result).to.equal('tester');
-        expect(validResponse.headers['set-cookie']).to.not.exist();
+        expect(validResponse.headers['set-cookie'][0])
+          .to.equal('AuthSession=; Max-Age=0; Expires=Thu, ' +
+            '01 Jan 1970 00:00:00 GMT');
+        done();
+      });
+    });
+  });
+
+  it('clear cookie on invalid', function(done) {
+    var server = new Hapi.Server();
+    server.connection();
+    server.register(require('../'), function(error) {
+      expect(error).to.not.exist();
+
+      server.auth.strategy('default', 'couchdb-cookie', true);
+
+      server.route({
+        method: 'GET',
+        path: '/',
+        handler: function(request, reply) {
+          return reply();
+        }
+      });
+
+      server.inject({
+        url: '/',
+        headers: {
+          cookie: 'AuthSession=123456'
+        }
+      }, function(res) {
+        console.log(res.headers);
+
+        expect(res.statusCode).to.equal(401);
+        expect(res.headers['set-cookie'][0])
+          .to.equal('AuthSession=; Max-Age=0; Expires=Thu, ' +
+            '01 Jan 1970 00:00:00 GMT');
         done();
       });
     });
@@ -542,7 +585,6 @@ describe('scheme', function() {
       var server = new Hapi.Server();
       server.connection();
       server.register(require('../'), function(error) {
-
         expect(error).to.not.exist();
 
         server.auth.strategy('default', 'couchdb-cookie', true, {
@@ -629,39 +671,4 @@ describe('scheme', function() {
       });
     });
   });
-
-//   it('clear cookie on invalid', function(done) {
-//
-//     var server = new Hapi.Server();
-//     server.connection();
-//     server.register(require('../'), function(error) {
-//
-//       expect(error).to.not.exist();
-//
-//       server.auth.strategy('default', 'couchdb-cookie', true, {
-//         // password: 'password',
-//         // ttl: 60 * 1000,
-//       });
-//
-//       server.route({
-//         method: 'GET',
-//         path: '/',
-//         handler: function(request, reply) {
-//           return reply();
-//         }
-//       });
-//
-//       server.inject({
-//         url: '/',
-//         headers: {
-//           cookie: 'sid=123456'
-//         }
-//       }, function(res) {
-//
-//         expect(res.statusCode).to.equal(401);
-//         expect(res.headers['set-cookie'][0]).to.equal('sid=; Max-Age=0; Expires=Thu, 01 Jan 1970 00:00:00 GMT; Secure; HttpOnly; Path=/');
-//         done();
-//       });
-//     });
-  // });
 });
