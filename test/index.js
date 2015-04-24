@@ -538,38 +538,35 @@ describe('scheme', function() {
       });
     });
 
-//     it('sends to login page (uri with query)', function(done) {
-//       var server = new Hapi.Server();
-//       server.connection();
-//       server.register(require('../'), function(error) {
-//
-//         expect(error).to.not.exist();
-//
-//         server.auth.strategy('default', 'couchdb-cookie', true, {
-//           // password: 'password',
-//           // ttl: 60 * 1000,
-//           redirectTo: 'http://example.com/login?mode=1',
-//           appendNext: true
-//         });
-//
-//         server.route({
-//           method: 'GET',
-//           path: '/',
-//           handler: function(request, reply) {
-//
-//             return reply('never');
-//           }
-//         });
-//
-//         server.inject('/', function(res) {
-//
-//           expect(res.statusCode).to.equal(302);
-//           expect(res.headers.location).to.equal('http://example.com/login?mode=1&next=%2F');
-//           done();
-//         });
-//       });
-//     });
-//
+    it('sends to login page (uri with query)', function(done) {
+      var server = new Hapi.Server();
+      server.connection();
+      server.register(require('../'), function(error) {
+
+        expect(error).to.not.exist();
+
+        server.auth.strategy('default', 'couchdb-cookie', true, {
+          redirectTo: 'http://example.com/login?mode=1',
+          appendNext: true
+        });
+
+        server.route({
+          method: 'GET',
+          path: '/',
+          handler: function(request, reply) {
+            return reply('never');
+          }
+        });
+
+        server.inject('/', function(res) {
+          expect(res.statusCode).to.equal(302);
+          expect(res.headers.location)
+            .to.equal('http://example.com/login?mode=1&next=%2F');
+          done();
+        });
+      });
+    });
+
 //     it('sends to login page and does not append the next query when appendNext is false', function(done) {
 //
 //       var server = new Hapi.Server();
