@@ -598,44 +598,38 @@ describe('scheme', function() {
       }
     );
 
-//     it('redirect on try', function(done) {
-//
-//       var server = new Hapi.Server();
-//       server.connection();
-//       server.register(require('../'), function(error) {
-//
-//         expect(error).to.not.exist();
-//
-//         server.auth.strategy('default', 'couchdb-cookie', true, {
-//           // password: 'password',
-//           // ttl: 60 * 1000,
-//           redirectTo: 'http://example.com/login',
-//           appendNext: true
-//         });
-//
-//         server.route({
-//           method: 'GET',
-//           path: '/',
-//           config: {
-//             auth: {
-//               mode: 'try'
-//             }
-//           },
-//           handler: function(request, reply) {
-//
-//             return reply('try');
-//           }
-//         });
-//
-//         server.inject('/', function(res) {
-//
-//           expect(res.statusCode).to.equal(302);
-//           done();
-//         });
-//       });
-//     });
-//   });
-//
+    it('redirect on try', function(done) {
+      var server = new Hapi.Server();
+      server.connection();
+      server.register(require('../'), function(error) {
+        expect(error).to.not.exist();
+
+        server.auth.strategy('default', 'couchdb-cookie', true, {
+          redirectTo: 'http://example.com/login',
+          appendNext: true
+        });
+
+        server.route({
+          method: 'GET',
+          path: '/',
+          config: {
+            auth: {
+              mode: 'try'
+            }
+          },
+          handler: function(request, reply) {
+            return reply('try');
+          }
+        });
+
+        server.inject('/', function(res) {
+          expect(res.statusCode).to.equal(302);
+          done();
+        });
+      });
+    });
+  });
+
 //   it('clear cookie on invalid', function(done) {
 //
 //     var server = new Hapi.Server();
@@ -669,5 +663,5 @@ describe('scheme', function() {
 //         done();
 //       });
 //     });
-  });
+  // });
 });
