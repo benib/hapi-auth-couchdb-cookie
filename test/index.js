@@ -55,13 +55,13 @@ describe('scheme', function() {
 
       server.route({
         method: 'GET',
-        path: '/login/{user}/{password}',
+        path: '/login/{username}/{password}',
         config: {
           auth: {
             mode: 'try'
           },
           handler: function(request, reply) {
-            return reply(request.params.user + request.params.password);
+            return reply(request.params.username + request.params.password);
           }
         }
       });
@@ -177,16 +177,13 @@ describe('scheme', function() {
 
       server.route({
         method: 'GET',
-        path: '/login/{user}',
+        path: '/login/{username}',
         config: {
           auth: {
             mode: 'try'
           },
           handler: function(request, reply) {
-            request.auth.session.set({
-              user: request.params.user
-            });
-            return reply(request.params.user);
+            return reply(request.params.username);
           }
         }
       });
@@ -238,13 +235,13 @@ describe('scheme', function() {
 
       server.route({
         method: 'GET',
-        path: '/login/{user}/{password}',
+        path: '/login/{username}/{password}',
         config: {
           auth: {
             mode: 'try'
           },
           handler: function(request, reply) {
-            return reply(request.params.user);
+            return reply(request.params.username);
           }
         }
       });
@@ -328,13 +325,13 @@ describe('scheme', function() {
 
       server.route({
         method: 'GET',
-        path: '/login/{user}/{password}',
+        path: '/login/{username}/{password}',
         config: {
           auth: {
             mode: 'try'
           },
           handler: function(request, reply) {
-            return reply(request.params.user);
+            return reply(request.params.username);
           }
         }
       });
@@ -381,13 +378,13 @@ describe('scheme', function() {
 
       server.route({
         method: 'GET',
-        path: '/login/{user}/{password}',
+        path: '/login/{username}/{password}',
         config: {
           auth: {
             mode: 'try'
           },
           handler: function(request, reply) {
-            return reply(request.params.user + request.params.password);
+            return reply(request.params.username + request.params.password);
           }
         }
       });
@@ -437,13 +434,13 @@ describe('scheme', function() {
 
       server.route({
         method: 'GET',
-        path: '/login/{user}/{password}',
+        path: '/login/{username}/{password}',
         config: {
           auth: {
             mode: 'try'
           },
           handler: function(request, reply) {
-            return reply(request.params.user);
+            return reply(request.params.username);
           }
         }
       });
@@ -511,6 +508,49 @@ describe('scheme', function() {
         url: '/'
       }, function(res) {
         expect(res.statusCode).to.equal(500);
+        done();
+      });
+    });
+  });
+
+  it('accepts a custom username and password params', function(done) {
+    var server = new Hapi.Server();
+
+    server.connection();
+    server.register(require('../'), function(error) {
+      expect(error).to.not.exist();
+
+      server.auth.strategy('default', 'couchdb-cookie', true, {
+        usernameParam: 'myuser',
+        passwordParam: 'secrettext',
+        validateFunc: function(session, callback) {
+          var override = Hoek.clone(session);
+          override.something = 'new';
+
+          return callback(null, session.name === 'tester', override);
+        }
+      });
+
+      server.route({
+        method: 'GET',
+        path: '/login/{myuser}/{secrettext}',
+        config: {
+          auth: {
+            mode: 'try'
+          },
+          handler: function(request, reply) {
+            return reply(request.params.myuser + request.params.secrettext);
+          }
+        }
+      });
+
+      server.inject('/login/tester/pw', function(validResponse) {
+        expect(validResponse.result).to.equal('testerpw');
+
+        var header = validResponse.headers['set-cookie'];
+        expect(header.length).to.equal(1);
+        // expect(header[0]).to.contain('Max-Age=60');
+
         done();
       });
     });
