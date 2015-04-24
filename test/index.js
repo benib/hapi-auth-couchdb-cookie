@@ -219,65 +219,92 @@ describe('scheme', function() {
     });
   });
 
-  // it('ends a session', function(done) {
-  //   var server = new Hapi.Server();
-  //   server.connection();
-  //   server.register(require('../'), function(error) {
-  //     expect(error).to.not.exist();
-  //
-  //     server.auth.strategy('default', 'couchdb-cookie', true, {
-  //       validateFunc: function(session, callback) {
-  //         var override = Hoek.clone(session);
-  //         override.something = 'new';
-  //
-  //         return callback(null, session.name === 'tester', override);
-  //       }
-  //     });
-  //
-  //     server.route({
-  //       method: 'GET',
-  //       path: '/login/{user}',
-  //       config: {
-  //         auth: {
-  //           mode: 'try'
-  //         },
-  //         handler: function(request, reply) {
-  //           return reply(request.params.user);
-  //         }
-  //       }
-  //     });
-  //
-  //     server.route({
-  //       method: 'GET',
-  //       path: '/logout',
-  //       handler: function(request, reply) {
-  //         request.auth.session.clear();
-  //         return reply('logged-out');
-  //       }
-  //     });
-  //
-  //     server.inject('/login/valid', function(res) {
-  //       expect(res.result).to.equal('valid');
-  //       var header = res.headers['set-cookie'];
-  //       expect(header.length).to.equal(1);
-  //       // expect(header[0]).to.contain('Max-Age=60');
-  //       var cookie = header[0].split(';');
-  //
-  //       server.inject({
-  //         method: 'GET',
-  //         url: '/logout',
-  //         headers: {
-  //           cookie: cookie[0]
-  //         }
-  //       }, function(logoutRes) {
-  //         expect(logoutRes.statusCode).to.equal(200);
-  //         expect(logoutRes.result).to.equal('logged-out');
-  //         // expect(logoutRes.headers['set-cookie'][0]).to.equal('special=; Max-Age=0; Expires=Thu, 01 Jan 1970 00:00:00 GMT; Secure; HttpOnly; Domain=example.com; Path=/');
-  //         done();
-  //       });
-  //     });
-  //   });
-  // });
+  it('ends a session', function(done) {
+    var server = new Hapi.Server();
+    server.connection();
+    server.register(require('../'), function(error) {
+      expect(error).to.not.exist();
+
+      server.auth.strategy('default', 'couchdb-cookie', true, {
+        validateFunc: function(session, callback) {
+          var override = Hoek.clone(session);
+          override.something = 'new';
+
+          return callback(null, session.name === 'tester', override);
+        }
+      });
+
+      server.route({
+        method: 'GET',
+        path: '/login/{user}/{password}',
+        config: {
+          auth: {
+            mode: 'try'
+          },
+          handler: function(request, reply) {
+            return reply(request.params.user);
+          }
+        }
+      });
+
+      server.route({
+        method: 'GET',
+        path: '/logout',
+        handler: function(request, reply) {
+          request.auth.session.clear(reply, function() {
+            // console.log(arguments);
+            return reply('logged-out');
+          });
+        }
+      });
+
+      server.route({
+        method: 'GET',
+        path: '/resource',
+        handler: function(request, reply) {
+          expect(request.auth.credentials.something).to.equal('new');
+          return reply('resource');
+        }
+      });
+
+      server.inject('/login/tester/pw', function(res) {
+        expect(res.result).to.equal('tester');
+        var header = res.headers['set-cookie'];
+        expect(header.length).to.equal(1);
+        // expect(header[0]).to.contain('Max-Age=60');
+        var cookie = header[0].split(';');
+
+        server.inject({
+          method: 'GET',
+          url: '/logout',
+          headers: {
+            cookie: cookie[0]
+          }
+        }, function(logoutRes) {
+          expect(logoutRes.statusCode).to.equal(200);
+          expect(logoutRes.result).to.equal('logged-out');
+
+          var logoutHeader = logoutRes.headers['set-cookie'];
+          expect(logoutHeader.length).to.equal(1);
+          // expect(header[0]).to.contain('Max-Age=60');
+          var logoutCookie = logoutHeader[0].split(';');
+
+          server.inject({
+            method: 'GET',
+            url: '/resource',
+            headers: {
+              cookie: logoutCookie[0]
+            }
+          }, function(resourceResponse) {
+            expect(resourceResponse.statusCode).to.equal(401);
+            expect(resourceResponse.headers['set-cookie']).to.not.exist();
+            expect(resourceResponse.result).to.not.equal('resource');
+            done();
+          });
+        });
+      });
+    });
+  });
 
   it('fails a request with invalid session', function(done) {
     var server = new Hapi.Server();
