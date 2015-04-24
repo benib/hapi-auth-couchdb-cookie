@@ -1,8 +1,6 @@
 ### hapi-auth-couchdb-cookie
 
-[**hapi**](https://github.com/hapijs/hapi) [CouchDB](https://couchdb.apache.org/) Cookie authentication plugin. Heavily inspired by [hapi-auth-cookie](https://github.com/hapijs/hapi-auth-cookie/).
-
-Lead Maintainer: [Robert Katzki](https://github.com/ro-ka)
+[**hapi**](https://github.com/hapijs/hapi) [CouchDB](https://couchdb.apache.org/) Cookie authentication plugin, heavily inspired by [hapi-auth-cookie](https://github.com/hapijs/hapi-auth-cookie/).
 
 CouchDB Cookie authentication provides authentication via a CouchDB. It checks the user credentials with a CouchDB and passes the Cookie from CouchDB to the user. All following requests can use the cookie for access. A `validateFunc` can be passed in, in case the cookie's content requires validation on each request. Note that cookie operates as a bearer token and anyone in possession of the cookie content can use it to impersonate its true owner. The `'couchdb-cookie`' scheme takes the following required options:
 
@@ -12,6 +10,9 @@ CouchDB Cookie authentication provides authentication via a CouchDB. It checks t
   Defaults to no redirection.
 - `appendNext` - if `true` and `redirectTo` is `true`, appends the current request path to the query component of the `redirectTo` URI using the parameter name `'next'`. Set to a string to use a different parameter name. Defaults to `false`.
 - `redirectOnTry` - if `false` and route authentication mode is `'try'`, authentication errors will not trigger a redirection. Requires **hapi** version 6.2.0 or newer. Defaults to `true`;
+- `couchdbUrl` - URL of the CouchDB to authenticate to. Defaults to `http://localhost:5984`;
+- `usernameParam` - parameter name for login. When sending a `username` and `password` param, this will authenticate with CouchDB. Defaults to `username`;
+- `passwordParam` - parameter name for login. When sending a `username` and `password` param, this will authenticate with CouchDB. Defaults to `password`;
 - `validateFunc` - an optional session validation function used to validate the content of the session cookie on each request. Used to verify that the internal session state is still valid (e.g. user account still exists). The function has the signature `function(session, callback)` where:
     - `session` - is the session object set via `request.auth.session.set()`.
     - `callback` - a callback function with the signature `function(err, isValid, credentials)` where:
@@ -27,7 +28,7 @@ var Hapi = require('hapi');
 
 var home = function (request, reply) {
   reply('<html><head><title>Login page</title></head><body><h3>Welcome '
-    + request.auth.credentials.name
+    + request.auth.credentials.username
     + '!</h3><br/><form method="get" action="/logout">'
     + '<input type="submit" value="Logout">'
     + '</form></body></html>');
@@ -66,13 +67,13 @@ var login = function (request, reply) {
       + '<input type="submit" value="Login"></form></body></html>');
   }
 
-  request.auth.session.set(account);
   return reply.redirect('/');
 };
 
 var logout = function (request, reply) {
-  request.auth.session.clear();
-  return reply.redirect('/');
+  request.auth.session.clear(function() {
+    return reply.redirect('/');
+  });
 };
 
 var server = new Hapi.Server();
@@ -80,10 +81,11 @@ server.connection({ port: 8000 });
 
 server.register(require('hapi-auth-couchdb-cookie'), function (err) {
   server.auth.strategy('session', 'couchdb-cookie', {
-    password: 'secret',
-    cookie: 'sid-example',
     redirectTo: '/login',
-    isSecure: false
+    appendNext: true,
+    couchdbUrl: 'http://localhost:5984',
+    usernameParam: 'username',
+    passwordParam: 'password'
   });
 });
 
@@ -95,8 +97,7 @@ server.route([
       handler: home,
       auth: 'session'
     }
-  },
-  {
+  }, {
     method: ['GET', 'POST'],
     path: '/login',
     config: {
@@ -111,8 +112,7 @@ server.route([
         }
       }
     }
-  },
-  {
+  }, {
     method: 'GET',
     path: '/logout',
     config: {
