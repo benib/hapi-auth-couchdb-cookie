@@ -567,39 +567,37 @@ describe('scheme', function() {
       });
     });
 
-//     it('sends to login page and does not append the next query when appendNext is false', function(done) {
-//
-//       var server = new Hapi.Server();
-//       server.connection();
-//       server.register(require('../'), function(error) {
-//
-//         expect(error).to.not.exist();
-//
-//         server.auth.strategy('default', 'couchdb-cookie', true, {
-//           // password: 'password',
-//           // ttl: 60 * 1000,
-//           redirectTo: 'http://example.com/login?mode=1',
-//           appendNext: false
-//         });
-//
-//         server.route({
-//           method: 'GET',
-//           path: '/',
-//           handler: function(request, reply) {
-//
-//             return reply('never');
-//           }
-//         });
-//
-//         server.inject('/', function(res) {
-//
-//           expect(res.statusCode).to.equal(302);
-//           expect(res.headers.location).to.equal('http://example.com/login?mode=1');
-//           done();
-//         });
-//       });
-//     });
-//
+    it(
+      'sends to login page and does not append the next query when !appendNext',
+      function(done) {
+        var server = new Hapi.Server();
+        server.connection();
+        server.register(require('../'), function(error) {
+          expect(error).to.not.exist();
+
+          server.auth.strategy('default', 'couchdb-cookie', true, {
+            redirectTo: 'http://example.com/login?mode=1',
+            appendNext: false
+          });
+
+          server.route({
+            method: 'GET',
+            path: '/',
+            handler: function(request, reply) {
+              return reply('never');
+            }
+          });
+
+          server.inject('/', function(res) {
+            expect(res.statusCode).to.equal(302);
+            expect(res.headers.location)
+              .to.equal('http://example.com/login?mode=1');
+            done();
+          });
+        });
+      }
+    );
+
 //     it('redirect on try', function(done) {
 //
 //       var server = new Hapi.Server();
