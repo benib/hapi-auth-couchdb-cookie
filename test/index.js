@@ -477,43 +477,39 @@ describe('scheme', function() {
       });
     });
 
-//     it('skips when route override', function(done) {
-//       var server = new Hapi.Server();
-//       server.connection();
-//       server.register(require('../'), function(error) {
-//
-//         expect(error).to.not.exist();
-//
-//         server.auth.strategy('default', 'couchdb-cookie', true, {
-//           // password: 'password',
-//           // ttl: 60 * 1000,
-//           redirectTo: 'http://example.com/login',
-//           appendNext: true
-//         });
-//
-//         server.route({
-//           method: 'GET',
-//           path: '/',
-//           handler: function(request, reply) {
-//
-//             return reply('never');
-//           },
-//           config: {
-//             plugins: {
-//               'hapi-auth-couchdb-cookie': {
-//                 redirectTo: false
-//               }
-//             }
-//           }
-//         });
-//
-//         server.inject('/', function(res) {
-//           expect(res.statusCode).to.equal(401);
-//           done();
-//         });
-//       });
-//     });
-//
+    it('skips when route override', function(done) {
+      var server = new Hapi.Server();
+      server.connection();
+      server.register(require('../'), function(error) {
+        expect(error).to.not.exist();
+
+        server.auth.strategy('default', 'couchdb-cookie', true, {
+          redirectTo: 'http://example.com/login',
+          appendNext: true
+        });
+
+        server.route({
+          method: 'GET',
+          path: '/',
+          handler: function(request, reply) {
+            return reply('never');
+          },
+          config: {
+            plugins: {
+              'hapi-auth-couchdb-cookie': {
+                redirectTo: false
+              }
+            }
+          }
+        });
+
+        server.inject('/', function(res) {
+          expect(res.statusCode).to.equal(401);
+          done();
+        });
+      });
+    });
+
 //     it('skips when redirectOnTry is false in try mode', function(done) {
 //       var server = new Hapi.Server();
 //       server.connection();
