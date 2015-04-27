@@ -29,7 +29,7 @@ Defaults to `http://localhost:5984`.
 Parameter name for login. When sending a `username` and `password` param, this will authenticate with CouchDB.
 Defaults to `username`.
 
-### `passwordParam`
+#### `passwordParam`
 Parameter name for login. When sending a `username` and `password` param, this will authenticate with CouchDB.
 Defaults to `password`.
 
