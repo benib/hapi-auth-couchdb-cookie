@@ -55,7 +55,7 @@ Type `String` | Default `password`
 
 Parameter name for login. When sending a `username` and `password` param, this will authenticate with CouchDB.
 
-#### `validateFunc`
+#### validateFunc
 Type `Function` | Default `function() {}`
 
 An optional session validation function used to validate the content of the session cookie on each request. Used to verify that the internal session state is still valid (e.g. user account still exists). The function has the signature `function(session, callback)` where:
