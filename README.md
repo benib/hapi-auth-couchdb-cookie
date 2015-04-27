@@ -4,22 +4,42 @@
 
 CouchDB Cookie authentication provides authentication via a CouchDB. It checks the user credentials with a CouchDB and passes the Cookie from CouchDB to the user. All following requests can use the cookie for access. A `validateFunc` can be passed in, in case the cookie's content requires validation on each request. Note that cookie operates as a bearer token and anyone in possession of the cookie content can use it to impersonate its true owner. The `'couchdb-cookie`' scheme takes the following required options:
 
-- `redirectTo` - optional login URI to redirect unauthenticated requests to. Note that using
-  `redirectTo` with authentication mode `'try'` will cause the protected endpoint to always
-  redirect, voiding `'try'` mode. To set an individual route to use or disable redirections, use the route `plugins` config (`{ config: { plugins: { 'hapi-auth-couchdb-cookie': { redirectTo: false } } } }`).
-  Defaults to no redirection.
-- `appendNext` - if `true` and `redirectTo` is `true`, appends the current request path to the query component of the `redirectTo` URI using the parameter name `'next'`. Set to a string to use a different parameter name. Defaults to `false`.
-- `redirectOnTry` - if `false` and route authentication mode is `'try'`, authentication errors will not trigger a redirection. Requires **hapi** version 6.2.0 or newer. Defaults to `true`;
-- `couchdbUrl` - URL of the CouchDB to authenticate to. Defaults to `http://localhost:5984`;
-- `usernameParam` - parameter name for login. When sending a `username` and `password` param, this will authenticate with CouchDB. Defaults to `username`;
-- `passwordParam` - parameter name for login. When sending a `username` and `password` param, this will authenticate with CouchDB. Defaults to `password`;
-- `validateFunc` - an optional session validation function used to validate the content of the session cookie on each request. Used to verify that the internal session state is still valid (e.g. user account still exists). The function has the signature `function(session, callback)` where:
-    - `session` - is the session object set via `request.auth.session.set()`.
-    - `callback` - a callback function with the signature `function(err, isValid, credentials)` where:
-        - `err` - an internal error.
-        - `isValid` - `true` if the content of the session is valid, otherwise `false`.
-        - `credentials` - a credentials object passed back to the application in
-          `request.auth.credentials`. If value is `null` or `undefined`, defaults to `session`. If set, will override the current cookie as if `request.auth.session.set()` was called.
+## Usage
+
+### Options
+
+#### `redirectTo`
+Optional login URI to redirect unauthenticated requests to. Note that using `redirectTo` with authentication mode `'try'` will cause the protected endpoint to always redirect, voiding `'try'` mode. To set an individual route to use or disable redirections, use the route `plugins` config (`{ config: { plugins: { 'hapi-auth-couchdb-cookie': { redirectTo: false } } } }`).
+Defaults to no redirection.
+
+#### `appendNext`
+If `true` and `redirectTo` is `true`, appends the current request path to the query component of the `redirectTo` URI using the parameter name `'next'`. Set to a string to use a different parameter name.
+Defaults to `false`.
+
+#### `redirectOnTry`
+If `false` and route authentication mode is `'try'`, authentication errors will not trigger a redirection.
+Requires **hapi** version 6.2.0 or newer.
+Defaults to `true`.
+
+#### `couchdbUrl`
+URL of the CouchDB to authenticate to.
+Defaults to `http://localhost:5984`.
+
+#### `usernameParam`
+Parameter name for login. When sending a `username` and `password` param, this will authenticate with CouchDB.
+Defaults to `username`.
+
+### `passwordParam`
+Parameter name for login. When sending a `username` and `password` param, this will authenticate with CouchDB.
+Defaults to `password`.
+
+#### `validateFunc`
+An optional session validation function used to validate the content of the session cookie on each request. Used to verify that the internal session state is still valid (e.g. user account still exists). The function has the signature `function(session, callback)` where:
+  - `session` - is the session object set via `request.auth.session.set()`.
+  - `callback` - a callback function with the signature `function(error, isValid, credentials)` where:
+      - `error` - an internal error.
+      - `isValid` - `true` if the content of the session is valid, otherwise `false`.
+      - `credentials` - a credentials object passed back to the application in `request.auth.credentials`. If value is `null` or `undefined`, defaults to `session`. If set, will override the current cookie as if `request.auth.session.set()` was called.
 
 Because this scheme decorates the `request` object with session-specific methods, it cannot be registered more than once.
 
