@@ -45,16 +45,6 @@ Type `String` | Default `http://localhost:5984`
 
 URL of the CouchDB to authenticate to.
 
-#### usernameParam
-Type `String` | Default `username`
-
-Parameter name for login. When sending a `username` and `password` param, this will authenticate with CouchDB.
-
-#### passwordParam
-Type `String` | Default `password`
-
-Parameter name for login. When sending a `username` and `password` param, this will authenticate with CouchDB.
-
 #### validateFunc
 Type `Function` | Default `function() {}`
 

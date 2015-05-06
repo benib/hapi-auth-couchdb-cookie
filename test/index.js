@@ -54,14 +54,20 @@ describe('scheme', function() {
       });
 
       server.route({
-        method: 'GET',
-        path: '/login/{username}/{password}',
+        method: 'POST',
+        path: '/login',
         config: {
           auth: {
             mode: 'try'
           },
           handler: function(request, reply) {
-            return reply(request.params.username + request.params.password);
+            request.auth.session.authenticate(
+              request.payload.username,
+              request.payload.password,
+              function() {
+                reply(request.payload.username + request.payload.password);
+              }
+            );
           }
         }
       });
@@ -75,12 +81,15 @@ describe('scheme', function() {
         }
       });
 
-      server.inject('/login/tester/pw', function(validResponse) {
+      server.inject({
+        method: 'POST',
+        url: '/login',
+        payload: '{"username":"tester","password":"pw"}'
+      }, function(validResponse) {
         expect(validResponse.result).to.equal('testerpw');
 
         var header = validResponse.headers['set-cookie'];
         expect(header.length).to.equal(1);
-        // expect(header[0]).to.contain('Max-Age=60');
 
         var cookie = header[0].split(';');
 
@@ -234,14 +243,20 @@ describe('scheme', function() {
       });
 
       server.route({
-        method: 'GET',
-        path: '/login/{username}/{password}',
+        method: 'POST',
+        path: '/login',
         config: {
           auth: {
             mode: 'try'
           },
           handler: function(request, reply) {
-            return reply(request.params.username);
+            request.auth.session.authenticate(
+              request.payload.username,
+              request.payload.password,
+              function() {
+                reply(request.payload.username);
+              }
+            );
           }
         }
       });
@@ -250,8 +265,7 @@ describe('scheme', function() {
         method: 'GET',
         path: '/logout',
         handler: function(request, reply) {
-          request.auth.session.clear(reply, function() {
-            // console.log(arguments);
+          request.auth.session.clear(function() {
             return reply('logged-out');
           });
         }
@@ -266,11 +280,15 @@ describe('scheme', function() {
         }
       });
 
-      server.inject('/login/tester/pw', function(res) {
+      server.inject({
+        method: 'POST',
+        url: '/login',
+        payload: '{"username":"tester","password":"pw"}'
+      },
+      function(res) {
         expect(res.result).to.equal('tester');
         var header = res.headers['set-cookie'];
         expect(header.length).to.equal(1);
-        // expect(header[0]).to.contain('Max-Age=60');
         var cookie = header[0].split(';');
 
         server.inject({
@@ -285,7 +303,6 @@ describe('scheme', function() {
 
           var logoutHeader = logoutRes.headers['set-cookie'];
           expect(logoutHeader.length).to.equal(1);
-          // expect(header[0]).to.contain('Max-Age=60');
           var logoutCookie = logoutHeader[0].split(';');
 
           server.inject({
@@ -324,14 +341,20 @@ describe('scheme', function() {
       });
 
       server.route({
-        method: 'GET',
-        path: '/login/{username}/{password}',
+        method: 'POST',
+        path: '/login',
         config: {
           auth: {
             mode: 'try'
           },
           handler: function(request, reply) {
-            return reply(request.params.username);
+            request.auth.session.authenticate(
+              request.payload.username,
+              request.payload.password,
+              function() {
+                reply(request.payload.username);
+              }
+            );
           }
         }
       });
@@ -345,7 +368,12 @@ describe('scheme', function() {
         }
       });
 
-      server.inject('/login/invalid/pw', function(res) {
+      server.inject({
+        method: 'POST',
+        url: '/login',
+        payload: '{"username":"invalid","password":"pw"}'
+      },
+      function(res) {
         expect(res.result).to.equal('invalid');
         expect(res.headers['set-cookie'][0])
           .to.equal('AuthSession=; Max-Age=0; Expires=Thu, ' +
@@ -377,14 +405,20 @@ describe('scheme', function() {
       server.auth.strategy('default', 'couchdb-cookie', true);
 
       server.route({
-        method: 'GET',
-        path: '/login/{username}/{password}',
+        method: 'POST',
+        path: '/login',
         config: {
           auth: {
             mode: 'try'
           },
           handler: function(request, reply) {
-            return reply(request.params.username + request.params.password);
+            request.auth.session.authenticate(
+              request.payload.username,
+              request.payload.password,
+              function() {
+                reply(request.payload.username + request.payload.password);
+              }
+            );
           }
         }
       });
@@ -398,11 +432,15 @@ describe('scheme', function() {
         }
       });
 
-      server.inject('/login/tester/pw', function(validResponse) {
+      server.inject({
+        method: 'POST',
+        url: '/login',
+        payload: '{"username":"tester","password":"pw"}'
+      },
+      function(validResponse) {
         expect(validResponse.result).to.equal('testerpw');
         var header = validResponse.headers['set-cookie'];
         expect(header.length).to.equal(1);
-        // expect(header[0]).to.contain('Max-Age=60');
         var cookie = header[0].split(';');
 
         server.inject({
@@ -433,24 +471,57 @@ describe('scheme', function() {
       });
 
       server.route({
-        method: 'GET',
-        path: '/login/{username}/{password}',
+        method: 'POST',
+        path: '/login',
         config: {
           auth: {
             mode: 'try'
           },
           handler: function(request, reply) {
-            return reply(request.params.username);
+            request.auth.session.authenticate(
+              request.payload.username,
+              request.payload.password,
+              function() {
+                reply(request.payload.username);
+              }
+            );
           }
         }
       });
 
-      server.inject('/login/tester/pw', function(validResponse) {
+      server.route({
+        method: 'GET',
+        path: '/resource',
+        handler: function(request, reply) {
+          expect(request.auth.credentials.name).to.equal('tester');
+          return reply('resource');
+        }
+      });
+
+      server.inject({
+        method: 'POST',
+        url: '/login',
+        payload: '{"username":"tester","password":"pw"}'
+      },
+      function(validResponse) {
         expect(validResponse.result).to.equal('tester');
-        expect(validResponse.headers['set-cookie'][0])
-          .to.equal('AuthSession=; Max-Age=0; Expires=Thu, ' +
-            '01 Jan 1970 00:00:00 GMT');
-        done();
+        var header = validResponse.headers['set-cookie'];
+        expect(header.length).to.equal(1);
+        var cookie = header[0].split(';');
+
+        server.inject({
+          method: 'GET',
+          url: '/resource',
+          headers: {
+            cookie: cookie[0]
+          }
+        }, function(resourceResponse) {
+          expect(resourceResponse.statusCode).to.equal(401);
+          expect(resourceResponse.headers['set-cookie'][0])
+            .to.equal('AuthSession=; Max-Age=0; Expires=Thu, ' +
+              '01 Jan 1970 00:00:00 GMT');
+          done();
+        });
       });
     });
   });
@@ -505,99 +576,12 @@ describe('scheme', function() {
       });
 
       server.inject({
-        url: '/'
+        url: '/',
+        headers: {
+          cookie: 'AuthSession=123456'
+        }
       }, function(res) {
         expect(res.statusCode).to.equal(500);
-        done();
-      });
-    });
-  });
-
-  it('accepts a custom username and password params', function(done) {
-    var server = new Hapi.Server();
-
-    server.connection();
-    server.register(require('../'), function(error) {
-      expect(error).to.not.exist();
-
-      server.auth.strategy('default', 'couchdb-cookie', true, {
-        usernameParam: 'myuser',
-        passwordParam: 'secrettext',
-        validateFunc: function(session, callback) {
-          var override = Hoek.clone(session);
-          override.something = 'new';
-
-          return callback(null, session.name === 'tester', override);
-        }
-      });
-
-      server.route({
-        method: 'GET',
-        path: '/login/{myuser}/{secrettext}',
-        config: {
-          auth: {
-            mode: 'try'
-          },
-          handler: function(request, reply) {
-            return reply(request.params.myuser + request.params.secrettext);
-          }
-        }
-      });
-
-      server.inject('/login/tester/pw', function(validResponse) {
-        expect(validResponse.result).to.equal('testerpw');
-
-        var header = validResponse.headers['set-cookie'];
-        expect(header.length).to.equal(1);
-        // expect(header[0]).to.contain('Max-Age=60');
-
-        done();
-      });
-    });
-  });
-
-  it('allows overriding username and password', function(done) {
-    var server = new Hapi.Server();
-
-    server.connection();
-    server.register(require('../'), function(error) {
-      expect(error).to.not.exist();
-
-      server.auth.strategy('default', 'couchdb-cookie', true, {
-        validateFunc: function(session, callback) {
-          var override = Hoek.clone(session);
-          override.something = 'new';
-
-          return callback(null, session.name === 'tester', override);
-        }
-      });
-
-      server.route({
-        method: 'GET',
-        path: '/login/{myuser}/{secrettext}',
-        config: {
-          auth: {
-            mode: 'try'
-          },
-          plugins: {
-            'hapi-auth-couchdb-cookie': {
-              usernameParam: 'myuser',
-              passwordParam: 'secrettext'
-            }
-          },
-          handler: function(request, reply) {
-            return reply(request.params.myuser + request.params.secrettext);
-          }
-        }
-      });
-
-      server.inject('/login/tester/pw', function(validResponse) {
-        expect(validResponse.result).to.equal('testerpw');
-
-        var header = validResponse.headers['set-cookie'];
-        expect(header.length).to.equal(1);
-        // expect(header[0]).to.contain('Max-Age=60');
-
         done();
       });
     });
@@ -722,7 +706,7 @@ describe('scheme', function() {
     });
 
     it(
-      'sends to login page and does not append the next query when !appendNext',
+      'sends to login and does not append the next query on !appendNext',
       function(done) {
         var server = new Hapi.Server();
         server.connection();

@@ -25,6 +25,7 @@
   },
   "dependencies": {
     "boom": "^2.7.0",
+    "cookie": "^0.1.2",
     "nano": "^6.1.2"
   },
   "peerDependencies": {

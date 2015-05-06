@@ -1,88 +1,89 @@
-var Hapi = require('hapi');
+var Hapi = require('hapi'),
+  server = new Hapi.Server();
 
-var home = function (request, reply) {
-  reply('<html><head><title>Login page</title></head><body><h3>Welcome '
-    + request.auth.credentials.username
-    + '!</h3><br/><form method="get" action="/logout">'
-    + '<input type="submit" value="Logout">'
-    + '</form></body></html>');
-};
-
-var login = function(request, reply) {
-  if (request.auth.isAuthenticated) {
-    return reply.redirect('/');
-  }
-
-  var message = '';
-
-  if (request.method === 'post') {
-    if (!request.payload.username ||
-      !request.payload.password
-    ) {
-      message = 'Missing username or password';
-    }
-  }
-
-  if (request.method === 'get' || message) {
-    return reply('<html><head><title>Login page</title></head><body>'
-      + (message ? '<h3>' + message + '</h3><br/>' : '')
-      + '<form method="post" action="/login">'
-      + 'Username: <input type="text" name="username"><br>'
-      + 'Password: <input type="password" name="password"><br/>'
-      + '<input type="submit" value="Login"></form></body></html>');
-  }
-
-  return reply.redirect('/');
-};
-
-var logout = function (request, reply) {
-  request.auth.session.clear(function() {
-    return reply.redirect('/');
-  });
-};
-
-var server = new Hapi.Server();
 server.connection({port: 8000});
+server.register(require('../'), function(error) {
+  if (error) {
+    /* eslint-disable no-console */
+    console.error(error);
+    /* eslint-enable no-console */
+  }
 
-server.register(require('../'), function() {
-  server.auth.strategy('session', 'couchdb-cookie', {
-    redirectTo: '/login',
-    appendNext: true
+  server.auth.strategy('default', 'couchdb-cookie', true, {
+    redirectTo: '/login'
   });
-});
 
-server.route([
-  {
+  server.route({
     method: 'GET',
     path: '/',
-    config: {
-      handler: home,
-      auth: 'session'
+    handler: function(request, reply) {
+      return reply(
+        '<html><head><title>Login page</title></head><body><h3>Welcome ' +
+        request.auth.credentials.username +
+        '!</h3><br/><form method="post" action="/logout">' +
+        '<input type="submit" value="Logout">' +
+        '</form></body></html>'
+      );
     }
-  }, {
-    method: ['GET', 'POST'],
+  });
+
+  server.route({
+    method: 'GET',
     path: '/login',
     config: {
-      handler: login,
       auth: {
-        mode: 'try',
-        strategy: 'session'
+        mode: 'try'
       },
       plugins: {
         'hapi-auth-couchdb-cookie': {
           redirectTo: false
         }
+      },
+      handler: function(request, reply) {
+        return reply(
+          '<html><head><title>Login page</title></head><body>' +
+          '<form method="post" action="/login">' +
+          'Username: <input type="text" name="username"><br>' +
+          'Password: <input type="password" name="password"><br/>' +
+          '<input type="submit" value="Login"></form></body></html>'
+        );
       }
     }
-  }, {
-    method: 'GET',
+  });
+
+  server.route({
+    method: 'POST',
+    path: '/login',
+    config: {
+      auth: {
+        mode: 'try'
+      },
+      handler: function(request, reply) {
+        request.auth.session.authenticate(
+          request.payload.username,
+          request.payload.password,
+          function() {
+            return reply.redirect('/');
+          }
+        );
+      }
+    }
+  });
+
+  server.route({
+    method: 'POST',
     path: '/logout',
     config: {
-      handler: logout,
-      auth: 'session'
+      handler: function(request, reply) {
+        request.auth.session.clear(function() {
+          return reply.redirect('/');
+        });
+      }
     }
-  }
-]);
+  });
 
-server.start();
-console.log('Server started on http://localhost:8000');
+  server.start();
+  /* eslint-disable no-console */
+  console.log('Server started on http://localhost:8000');
+  /* eslint-enable no-console */
+});
