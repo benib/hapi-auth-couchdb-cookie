@@ -1,7 +1,7 @@
 {
   "name": "hapi-auth-couchdb-cookie",
   "description": "CouchDB Cookie authentication plugin",
-  "version": "1.0.0",
+  "version": "2.0.0",
   "author": "Robert Katzki <katzki@ubilabs.net>",
   "homepage": "https://github.com/ubilabs/hapi-auth-couchdb-cookie",
   "repository": {

@@ -1,3 +1,16 @@
+## 2.0.0 (2015-05-06)
+
+
+#### Bug Fixes
+
+* **example:** make example work again ([3d32c7ce](https://github.com/ubilabs/hapi-auth-couchdb-cookie/commit/3d32c7ce0f38c514f617967d2199cc2a177744bc))
+
+
+#### Features
+
+* **scheme:** let users handle initial authentication ([d282822c](https://github.com/ubilabs/hapi-auth-couchdb-cookie/commit/d282822c1ec20ab907a47f1ed7388496588c4b67))
+
+
 <a name="1.0.0"></a>
 ## 1.0.0 (2015-04-24)
 
