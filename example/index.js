@@ -58,6 +58,11 @@ server.register(require('../'), function(error) {
       auth: {
         mode: 'try'
       },
+      plugins: {
+        'hapi-auth-couchdb-cookie': {
+          redirectTo: false
+        }
+      },
       handler: function(request, reply) {
         request.auth.session.authenticate(
           request.payload.username,
