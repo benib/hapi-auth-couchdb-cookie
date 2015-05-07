@@ -64,7 +64,10 @@ describe('scheme', function() {
             request.auth.session.authenticate(
               request.payload.username,
               request.payload.password,
-              function() {
+              function(authError, credentials) {
+                expect(authError).to.not.exist();
+                expect(credentials).to.exist();
+                expect(credentials.name).to.equal('tester');
                 reply(request.payload.username + request.payload.password);
               }
             );
