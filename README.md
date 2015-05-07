@@ -55,6 +55,36 @@ An optional session validation function used to validate the content of the sess
       - `isValid` - `true` if the content of the session is valid, otherwise `false`.
       - `credentials` - a credentials object passed back to the application in `request.auth.credentials`. If value is `null` or `undefined`, defaults to `session`. If set, will override the current cookie as if `request.auth.session.set()` was called.
 
+### request.auth.session.authenticate(username, password, callback)
+
+Call this to authenticate against CouchDB. Takes three params.
+
+#### username
+Type `String` | No default
+
+The username to authenticate
+
+#### password
+Type `String` | No default
+
+The password of the user to authenticate
+
+#### callback
+Type `function` | No default
+
+Called when the authentication took place.
+
+
+### request.auth.session.clear(callback)
+
+Call this to clear authentication against CouchDB.
+
+#### callback
+Type `function` | No default
+
+Called when the session got cleared.
+
+
 ## Example
 
 See the `/example` folder. To see it in action, run:
