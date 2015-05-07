@@ -1,3 +1,13 @@
+## 2.1.0 (2015-05-07)
+
+
+#### Features
+
+* **scheme:**
+  * return error on authentication fail ([a57f5c48](https://github.com/ubilabs/hapi-auth-couchdb-cookie/commit/a57f5c48b29eedcb9550bb215f7925c9c7d1fa22))
+  * return credentials on successful auth ([1fee6606](https://github.com/ubilabs/hapi-auth-couchdb-cookie/commit/1fee66065b4cf8b69cb6e2a2ac3f72279f4f62e5))
+
+
 ### 2.0.2 (2015-05-07)
 
 
