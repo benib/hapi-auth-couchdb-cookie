@@ -72,7 +72,9 @@ The password of the user to authenticate
 #### callback
 Type `function` | No default
 
-Called when the authentication took place.
+Called when the authentication took place with to params:
+* `error` An optional error object containing the reason (most likely unauthenticated)
+* `credentials` The credentials from CouchDB
 
 
 ### request.auth.session.clear(callback)
