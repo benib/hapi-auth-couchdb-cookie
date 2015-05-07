@@ -1,3 +1,9 @@
+### 2.0.1 (2015-05-07)
+
+#### Bug fixes
+
+* add a missing dependency for dev mode ([37bea51d](https://github.com/ubilabs/hapi-auth-couchdb-cookie/commit/37bea51dfa96343d7cb240c3bd10b854282e36ee))
+
 ## 2.0.0 (2015-05-06)
 
 
