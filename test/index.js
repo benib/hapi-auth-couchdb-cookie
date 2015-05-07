@@ -354,7 +354,9 @@ describe('scheme', function() {
             request.auth.session.authenticate(
               request.payload.username,
               request.payload.password,
-              function() {
+              function(authError, credentials) {
+                expect(credentials).to.not.exist();
+                expect(authError).to.exist();
                 reply(request.payload.username);
               }
             );
