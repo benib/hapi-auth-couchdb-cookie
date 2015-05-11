@@ -80,9 +80,8 @@ server.register(require('../'), function(error) {
     path: '/logout',
     config: {
       handler: function(request, reply) {
-        request.auth.session.clear(function() {
-          return reply.redirect('/');
-        });
+        request.auth.session.clear();
+        return reply.redirect('/');
       }
     }
   });

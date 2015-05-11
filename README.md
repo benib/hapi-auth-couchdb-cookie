@@ -77,14 +77,9 @@ Called when the authentication took place with to params:
 * `credentials` The credentials from CouchDB
 
 
-### request.auth.session.clear(callback)
+### request.auth.session.clear()
 
 Call this to clear authentication against CouchDB.
-
-#### callback
-Type `function` | No default
-
-Called when the session got cleared.
 
 
 ## Example

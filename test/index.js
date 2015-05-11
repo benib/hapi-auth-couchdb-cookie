@@ -268,9 +268,8 @@ describe('scheme', function() {
         method: 'GET',
         path: '/logout',
         handler: function(request, reply) {
-          request.auth.session.clear(function() {
-            return reply('logged-out');
-          });
+          request.auth.session.clear();
+          return reply('logged-out');
         }
       });
 
@@ -306,6 +305,9 @@ describe('scheme', function() {
 
           var logoutHeader = logoutRes.headers['set-cookie'];
           expect(logoutHeader.length).to.equal(1);
+          expect(logoutHeader[0])
+            .to.equal('AuthSession=; Max-Age=0; Expires=Thu, ' +
+              '01 Jan 1970 00:00:00 GMT');
           var logoutCookie = logoutHeader[0].split(';');
 
           server.inject({
