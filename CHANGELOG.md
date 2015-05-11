@@ -1,3 +1,14 @@
+## 3.0.0 (2015-05-11)
+
+#### BREAKING CHANGES
+
+* request.auth.session.clear() has no callback anymore. Just call it to logout.
+
+#### Features
+
+* **scheme:** simplify logout ([a30ef02e](https://github.com/ubilabs/hapi-auth-couchdb-cookie/commit/a30ef02e0f6dbdc63fb5df5e4bc092bf3a45369c))
+
+
 ## 2.1.0 (2015-05-07)
 
 
