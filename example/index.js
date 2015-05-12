@@ -10,7 +10,8 @@ server.register(require('../'), function(error) {
   }
 
   server.auth.strategy('default', 'couchdb-cookie', true, {
-    redirectTo: '/login'
+    redirectTo: '/login',
+    redirectOnTry: false
   });
 
   server.route({
@@ -34,11 +35,6 @@ server.register(require('../'), function(error) {
       auth: {
         mode: 'try'
       },
-      plugins: {
-        'hapi-auth-couchdb-cookie': {
-          redirectTo: false
-        }
-      },
       handler: function(request, reply) {
         return reply(
           '<html><head><title>Login page</title></head><body>' +
@@ -57,11 +53,6 @@ server.register(require('../'), function(error) {
     config: {
       auth: {
         mode: 'try'
-      },
-      plugins: {
-        'hapi-auth-couchdb-cookie': {
-          redirectTo: false
-        }
       },
       handler: function(request, reply) {
         request.auth.session.authenticate(
