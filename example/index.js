@@ -20,7 +20,7 @@ server.register(require('../'), function(error) {
     handler: function(request, reply) {
       return reply(
         '<html><head><title>Login page</title></head><body><h3>Welcome ' +
-        request.auth.credentials.username +
+        request.auth.credentials.name +
         '!</h3><br/><form method="post" action="/logout">' +
         '<input type="submit" value="Logout">' +
         '</form></body></html>'
