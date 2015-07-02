@@ -1,4 +1,4 @@
-### hapi-auth-couchdb-cookie
+# hapi-auth-couchdb-cookie [![Build Status](https://travis-ci.org/ubilabs/hapi-auth-couchdb-cookie.svg?branch=master)](https://travis-ci.org/ubilabs/hapi-auth-couchdb-cookie)
 
 [**hapi**](https://github.com/hapijs/hapi) [CouchDB](https://couchdb.apache.org/) Cookie authentication plugin, heavily inspired by [hapi-auth-cookie](https://github.com/hapijs/hapi-auth-cookie/).
 
