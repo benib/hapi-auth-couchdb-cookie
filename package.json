@@ -42,7 +42,7 @@
   },
   "scripts": {
     "lint": "eslint ./",
-    "test": "npm run lint && node ./node_modules/lab/bin/lab -a code -t 98",
+    "test": "npm run lint && node ./node_modules/lab/bin/lab -a code -t 96",
     "changelog": "conventional-changelog-generator && vim CHANGELOG.md",
     "release": "echo 'Usage: npm run release:patch|minor|major'",
     "release:patch": "bumpery --verify='npm test' --no-push --no-commit --no-createTag --versionType patch && npm run changelog && npm run release:commit",
