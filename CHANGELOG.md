@@ -1,3 +1,11 @@
+### 3.0.1 (2015-11-19)
+
+
+#### Bug Fixes
+
+* **scheme:** correctly validate user session ([d6cdc241](https://github.com/ubilabs/hapi-auth-couchdb-cookie/commit/d6cdc241f06c555273b8170163c3023ff87c7c4b))
+
+
 ## 3.0.0 (2015-05-11)
 
 #### BREAKING CHANGES
