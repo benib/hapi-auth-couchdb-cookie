@@ -1,3 +1,11 @@
+### 3.0.2 (2016-01-05)
+
+
+#### Bug Fixes
+
+* allow hapi version >= 9 ([3d1a7468](https://github.com/ubilabs/hapi-auth-couchdb-cookie/commit/3d1a7468148c28bbd22787f56932516042e93ce8))
+
+
 ### 3.0.1 (2015-11-19)
 
 
