@@ -712,6 +712,37 @@ describe('scheme', function() {
       });
     });
 
+    it('sends to login page with custom next value', function(done) {
+      var server = new Hapi.Server();
+      server.connection();
+      server.register(require('../'), function(error) {
+        expect(error).to.not.exist();
+
+        server.auth.strategy('default', 'couchdb-cookie', true, {
+          redirectTo: 'http://example.com/login?mode=1',
+          getNextValue: function() {
+            return 'custom-next-value';
+          },
+          appendNext: true
+        });
+
+        server.route({
+          method: 'GET',
+          path: '/',
+          handler: function(request, reply) {
+            return reply('never');
+          }
+        });
+
+        server.inject('/', function(res) {
+          expect(res.statusCode).to.equal(302);
+          expect(res.headers.location)
+            .to.equal('http://example.com/login?mode=1&next=custom-next-value');
+          done();
+        });
+      });
+    });
+
     it(
       'sends to login and does not append the next query on !appendNext',
       function(done) {
