@@ -35,6 +35,11 @@ Type `String|Boolean` | Default `false`
 If `true` and `redirectTo` is `true`, appends the current request path to the query component of the `redirectTo` URI using the parameter name `'next'`. Set to a string to use a different parameter name.
 Defaults to `false`.
 
+#### getNextValue
+Type `function` | Default `undefined`
+
+If `redirectTo` and `appendNext` are `true` and it is a `function`, `getNextValue` gets called with the `request` object as the only parameter. It should return a `String` that is used as the value of either `'next'` or the String set as `appendNext` in the url for the redirect.
+
 #### redirectOnTry
 Type `Boolean` | Default `true`
 
